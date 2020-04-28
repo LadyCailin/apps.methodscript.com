@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+git pull --ff-only
+date > last_update.txt

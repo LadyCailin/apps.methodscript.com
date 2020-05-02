@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: MethodScript Apps
+  description: This is the api for the apps.methodscript.com server. This provides
+    various public functionality for users of the MethodScript programming language.
+  termsOfService: apps.methodscript.com/terms
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+externalDocs:
+  description: Find out more about MethodScript
+  url: https://methodscript.com
+servers:
+- url: http://localhost:8080
+  description: Test localhost server
+- url: https://apps.methodscript.com
+  description: The primary apps.methodscript.com server
+tags:
+- name: meta
+  description: Service related calls
+  externalDocs:
+    description: Find out more
+    url: https://methodscript.com
+paths:
+  /:
+    get:
+      tags:
+      - meta
+      summary: List services on this server
+      description: Lists the services that are available on this server. In general,
+        clients must load this page first to determine supported services, and ensure
+        that graceful fallbacks are provided if expected services are missing.
+      operationId: rootGET
+      responses:
+        "200":
+          description: This call should always be successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+      x-swagger-router-controller: Meta
+  /ping:
+    description: Pings the server to check its status.
+    get:
+      tags:
+      - meta
+      summary: Pings the server to check its status
+      operationId: pingGET
+      responses:
+        "200":
+          description: This call should always be successful.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Pong!
+                x-content-type: text/plain
+      x-swagger-router-controller: Meta
+components: {}

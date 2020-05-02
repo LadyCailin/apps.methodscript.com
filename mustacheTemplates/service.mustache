@@ -1,0 +1,47 @@
+'use strict';
+
+{{#operations}}
+{{#operation}}
+{{#contents}}
+
+var {{classname}} = require('../src/api/{{classname}}');
+
+/**
+ {{#summary}}
+ * {{{summary}}}
+ {{/summary}}
+ {{#notes}}
+ * {{{notes}}}
+ {{/notes}}
+ *
+{{#parameters}}
+ * {{paramName}} {{{dataType}}} {{{description}}}{{^required}} (optional){{/required}}
+{{/parameters}}
+{{^returnType}}
+ * no response value expected for this operation
+{{/returnType}}
+{{#returnType}}
+ * returns {{{returnType}}}
+{{/returnType}}
+ **/
+exports.{{{operationId}}} = function({{#parameters}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/parameters}}) {
+	return new Promise(function(resolve, reject) {
+		if({{classname}}.{{operationId}}) {
+			var apiResult = {{classname}}.{{operationId}}();
+			if(typeof apiResult === "object") {
+				var result = apiResult.payload;
+				var code = apiResult['code'] || 200;
+				var contentType = apiResult['contentType'] || (typeof result === "object" ? 'application/json' : 'text/plain');
+				resolve({response: result, code, contentType});
+			} else {
+				resolve({response: apiResult, code: 200});
+			}
+		} else {
+			reject({response: "Not Implemented Yet", code: 501 });
+		}
+	});
+}
+
+{{/contents}}
+{{/operation}}
+{{/operations}}

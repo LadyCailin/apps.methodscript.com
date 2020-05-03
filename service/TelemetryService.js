@@ -1,18 +1,18 @@
 'use strict';
 
-const Meta = require('../src/api/Meta');
+const Telemetry = require('../src/api/Telemetry');
 
 
 
 /**
- * Pings the server to check its status
+ * Obtains a telemetry key, which is used for future requests
  *
  * returns String
  **/
-exports.pingGET = function() {
+exports.telemetryGET = function() {
 	return new Promise(function(resolve, reject) {
-		if(Meta.pingGET) {
-			const apiResult = Meta.pingGET();
+		if(Telemetry.telemetryGET) {
+			const apiResult = Telemetry.telemetryGET();
 			if(typeof apiResult === "object") {
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
@@ -30,15 +30,17 @@ exports.pingGET = function() {
 
 
 /**
- * List services on this server
- * Lists the services that are available on this server. In general, clients must load this page first to determine supported services, and ensure that graceful fallbacks are provided if expected services are missing.
+ * Submits a telemetry event.
+ * Submits a telemetry event, which is forwarded to the Application Insights application.
  *
- * returns List
+ * body String The telemetry event. The content should be text/plain, even though it will actually be json, as server merely forwards the content on to ApplicationInsights.
+ * key String The previously obtained key
+ * no response value expected for this operation
  **/
-exports.rootGET = function() {
+exports.telemetryKeyPOST = function(body,key) {
 	return new Promise(function(resolve, reject) {
-		if(Meta.rootGET) {
-			const apiResult = Meta.rootGET();
+		if(Telemetry.telemetryKeyPOST) {
+			const apiResult = Telemetry.telemetryKeyPOST(body,key);
 			if(typeof apiResult === "object") {
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;

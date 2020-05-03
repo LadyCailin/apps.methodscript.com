@@ -22,6 +22,8 @@ tags:
   externalDocs:
     description: Find out more
     url: https://methodscript.com
+- name: telemetry
+  description: Telemetry related services
 paths:
   /:
     get:
@@ -57,7 +59,63 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: Pong!
                 x-content-type: text/plain
       x-swagger-router-controller: Meta
+  /telemetry:
+    description: Obtains a telemetry key, which is used for future requests
+    get:
+      tags:
+      - telemetry
+      summary: Obtains a telemetry key, which is used for future requests
+      operationId: telemetryGET
+      responses:
+        "200":
+          description: Unless the client has been blocked, this call will always be
+            successful.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "403":
+          description: If this client has been blocked, this will not return a key.
+      x-swagger-router-controller: Telemetry
+  /telemetry/{key}:
+    description: Submits a telemetry event
+    post:
+      tags:
+      - telemetry
+      summary: Submits a telemetry event.
+      description: Submits a telemetry event, which is forwarded to the Application
+        Insights application.
+      operationId: telemetryKeyPOST
+      parameters:
+      - name: key
+        in: path
+        description: The previously obtained key
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The telemetry event. The content should be text/plain, even though
+          it will actually be json, as server merely forwards the content on to ApplicationInsights.
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          description: If the payload was successfully forwarded.
+        "403":
+          description: If the key was rejected. This can happen for a number of reasons,
+            including things like server restart or key expiry. In any case, simply
+            re-request a new key and try again. It can also happen if the server detects
+            you're trying to do bad things.
+        "502":
+          description: If the submission was successful, but Application Insights
+            rejected or otherwise unsuccessfully processed the request.
+      x-swagger-router-controller: Telemetry
 components: {}

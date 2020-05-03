@@ -1,8 +1,8 @@
 'use strict';
 
-var utils = require('../utils/writer.js');
+const utils = require('../utils/writer.js');
 {{#operations}}
-var {{classname}} = require('../{{implFolder}}/{{classname}}Service');
+const {{classname}} = require('../{{implFolder}}/{{classname}}Service');
 {{#operation}}
 {{#contents}}
 

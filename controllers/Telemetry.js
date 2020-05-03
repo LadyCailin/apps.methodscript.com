@@ -1,10 +1,10 @@
 'use strict';
 
 const utils = require('../utils/writer.js');
-const Meta = require('../service/MetaService');
+const Telemetry = require('../service/TelemetryService');
 
-module.exports.pingGET = function pingGET (req, res, next) {
-	Meta.pingGET()
+module.exports.telemetryGET = function telemetryGET (req, res, next) {
+	Telemetry.telemetryGET()
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType);
 		})
@@ -13,8 +13,8 @@ module.exports.pingGET = function pingGET (req, res, next) {
 		});
 };
 
-module.exports.rootGET = function rootGET (req, res, next) {
-	Meta.rootGET()
+module.exports.telemetryKeyPOST = function telemetryKeyPOST (req, res, next, body, key) {
+	Telemetry.telemetryKeyPOST(body, key)
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType);
 		})

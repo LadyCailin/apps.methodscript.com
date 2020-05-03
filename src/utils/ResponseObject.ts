@@ -11,6 +11,8 @@ export class ResponseObject {
 	 */
 	public static get NOT_IMPLEMENTED() : ResponseObject { return new ResponseObject("Not Implemented Yet", 501, "text/plain"); }
 
+	public static get FORBIDDEN() : ResponseObject { return new ResponseObject("Forbidden", 403, "text/plain"); }
+
 	private payload : any;
 	private code : number;
 	private contentType : string;

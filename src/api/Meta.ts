@@ -2,7 +2,7 @@
 import { ResponseObject } from '../utils/ResponseObject';
 
 export function pingGET() : ResponseObject {
-	var array = [
+	const array = [
 		"Pong!",
 		"Pang!",
 		"Pyong!",
@@ -17,7 +17,7 @@ export function pingGET() : ResponseObject {
 }
 
 export function rootGET() : ResponseObject {
-	var array = [
+	const array = [
 		"/ping"
 	];
 

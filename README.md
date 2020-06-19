@@ -57,6 +57,11 @@ written in TypeScript. API endpoints should return either string or ResponseObje
 Keep in mind, however, that while the bleeding edge server and client will always match, the server must continue to support older clients,
 and so can only deprecate capabilities within the deprecation guidelines.
 
+## Connecting locally
+When developing, you probably will be running the server locally, using the MethodScript client. In this case, you'll want to start up MethodScript
+directly, and provide the java command with `-Dmethodscript.apps.server="http://localhost:8080"` which will configure the client to hit that url
+instead of `apps.methodscript.com` directly.
+
 ### Deprecation guidelines
 There is support built in for deprecating server features. Some features are not user visible, and so may be removed without notice period, but
 for user visible features, the general timeline is a minimum year of deprecation, and longer for features that are difficult to replace. Where

@@ -14,7 +14,8 @@ let nag : boolean = true;
 
 const supportedMetrics : Array<string> = [
 	"metrics.methodscript.startup",
-	"logs.methodscript.startupMode"
+	"logs.methodscript.startupMode",
+	"metrics.methodscript.saOn",
 ];
 /**
  * Returns true if the metric is supported.
@@ -75,6 +76,8 @@ export function telemetryKeyPOST(body : string, key : string) : ResponseObject {
 
 	const data = JSON.stringify(obj);
 
+	console.log("Submitting " + data);
+
 	const options = {
 		hostname: azureAppInsightsHostname,
 		port: 443,
@@ -90,6 +93,9 @@ export function telemetryKeyPOST(body : string, key : string) : ResponseObject {
 		console.log(`statusCode: ${res.statusCode}`)
 		res.on('data', (d) => {
 			// Just ignore successes.
+			if(res.statusCode !== 200) {
+				process.stdout.write(d);
+			}
 		})
 	})
 

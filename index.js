@@ -15,13 +15,21 @@ var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/open
 expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
 
+var CORS = [
+	'https://methodscript.com'
+];
+
 if(process.argv && process.argv[2] === "local-start") {
 	console.log("Allowing CORS requests from localhost");
-	app.use(function (req, res, next) {
-		res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
-		next();
-	});
+	CORS.push('http://localhost:3001');
 }
+
+app.use(function (req, res, next) {
+	if(CORS.indexOf(req.header('Origin')) !== -1) {
+		res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
+	}
+	next();
+});
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, function () {

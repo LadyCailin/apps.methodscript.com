@@ -1,5 +1,7 @@
 cd "$(dirname "$0")"
-screen -S app -X quit
-git pull
-npm install
-./start
+pull=$(git pull)
+if [[ "$pull" != "Already up to date." ]]; then
+	screen -S app -X quit
+	npm install
+	./start
+fi

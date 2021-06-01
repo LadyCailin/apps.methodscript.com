@@ -16,7 +16,8 @@ expressAppConfig.addValidator();
 var app = expressAppConfig.getApp();
 
 var CORS = [
-	'https://methodscript.com'
+	'https://methodscript.com',
+	'http://localhost:8080'
 ];
 
 if(process.argv && process.argv[2] === "local-start") {

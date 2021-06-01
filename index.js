@@ -17,12 +17,14 @@ var app = expressAppConfig.getApp();
 
 var CORS = [
 	'https://methodscript.com',
-	'http://localhost:8080'
+	'http://localhost:8080',
+	'http://127.0.0.1:8080'
 ];
 
 if(process.argv && process.argv[2] === "local-start") {
 	console.log("Allowing CORS requests from localhost");
 	CORS.push('http://localhost:3001');
+	CORS.push('http://127.0.0.1:3001');
 }
 
 app.use(function (req, res, next) {

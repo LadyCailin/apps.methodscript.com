@@ -79,3 +79,12 @@ For feature removals where the feature is simply deprecated, and is no longer us
 before using a feature, the client always checks if a feature is supported. If a feature is removed from this list, then the
 client will not try to use the functionality in the first place. If the feature is set to `deprecated DATE`, then it will continue
 to use the service, but will notify the user that the feature is being deprecated, and will be removed at the specified date.
+
+### Setting up secrets
+Secrets are not stored in the source code, but are required for many operations. These secrets should simply be exported to the
+environment, and will be read in appropriately during runtime. To make development work easier, all places that use secrets
+should have some fallback if secrets are missing (even if they just gracefully disable themselves) rather than crashing the
+program. _Incorrect_ secrets however, may cause a crash.
+
+For reference, to set an environmental variable in bash, use `export SecretName=Secret` and in batch, use `set SecretName=Secret`.
+These values can be read in code with `process.env.SecretName`, and may be undefined.

@@ -30,9 +30,9 @@ paths:
       tags:
       - meta
       summary: List services on this server
-      description: Lists the services that are available on this server. In general,
-        clients must load this page first to determine supported services, and ensure
-        that graceful fallbacks are provided if expected services are missing.
+      description: "Lists the services that are available on this server. In general,\
+        \ clients must load this page first to determine supported services, and ensure\
+        \ that graceful fallbacks are provided if expected services are missing."
       operationId: rootGET
       responses:
         "200":
@@ -62,23 +62,23 @@ paths:
                 x-content-type: text/plain
       x-swagger-router-controller: Meta
   /telemetry:
-    description: Obtains a telemetry key, which is used for future requests
+    description: "Obtains a telemetry key, which is used for future requests"
     get:
       tags:
       - telemetry
-      summary: Obtains a telemetry key, which is used for future requests
+      summary: "Obtains a telemetry key, which is used for future requests"
       operationId: telemetryGET
       responses:
         "200":
-          description: Unless the client has been blocked, this call will always be
-            successful.
+          description: "Unless the client has been blocked, this call will always\
+            \ be successful."
           content:
             text/plain:
               schema:
                 type: string
                 x-content-type: text/plain
         "403":
-          description: If this client has been blocked, this will not return a key.
+          description: "If this client has been blocked, this will not return a key."
       x-swagger-router-controller: Telemetry
   /telemetry/{key}:
     description: Submits a telemetry event
@@ -86,8 +86,8 @@ paths:
       tags:
       - telemetry
       summary: Submits a telemetry event.
-      description: Submits a telemetry event, which is forwarded to the Application
-        Insights application.
+      description: "Submits a telemetry event, which is forwarded to the Application\
+        \ Insights application."
       operationId: telemetryKeyPOST
       parameters:
       - name: key
@@ -99,8 +99,9 @@ paths:
         schema:
           type: string
       requestBody:
-        description: The telemetry event. The content should be text/plain, even though
-          it will actually be json, as server merely forwards the content on to ApplicationInsights.
+        description: "The telemetry event. The content should be text/plain, even\
+          \ though it will actually be json, as server merely forwards the content\
+          \ on to ApplicationInsights."
         content:
           text/plain:
             schema:
@@ -109,13 +110,93 @@ paths:
       responses:
         "200":
           description: If the payload was successfully forwarded.
+        "400":
+          description: If the payload is malformed.
         "403":
-          description: If the key was rejected. This can happen for a number of reasons,
-            including things like server restart or key expiry. In any case, simply
-            re-request a new key and try again. It can also happen if the server detects
-            you're trying to do bad things.
+          description: "If the key was rejected. This can happen for a number of reasons,\
+            \ including things like server restart or key expiry. In any case, simply\
+            \ re-request a new key and try again. It can also happen if the server\
+            \ detects you're trying to do bad things."
         "502":
-          description: If the submission was successful, but Application Insights
-            rejected or otherwise unsuccessfully processed the request.
+          description: "If the submission was successful, but Application Insights\
+            \ rejected or otherwise unsuccessfully processed the request."
       x-swagger-router-controller: Telemetry
+  /builds:
+    description: Provides a list of artifact types available for download
+    get:
+      tags:
+      - builds
+      summary: Provides a list of artifact types available for download
+      operationId: buildsGET
+      responses:
+        "200":
+          description: Returns a list of builds available.
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+      x-swagger-router-controller: Builds
+  /builds/{artifact}:
+    description: Provides a list of builds of the specified artifact available for
+      download
+    get:
+      tags:
+      - builds
+      summary: Provides a list of builds of the specified artifact available for download
+      operationId: buildsArtifactGET
+      parameters:
+      - name: artifact
+        in: path
+        description: The artifact type to list builds for
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns a list of builds available.
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+      x-swagger-router-controller: Builds
+  /builds/{artifact}/{id}:
+    description: Downloads a specific build of the specified artifact type
+    get:
+      tags:
+      - builds
+      summary: Downloads a specific build
+      operationId: buildsArtifactIdGET
+      parameters:
+      - name: artifact
+        in: path
+        description: The artifact type to download
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: The previously obtained id of the build you wish to download
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: If the specific build exists.
+          content:
+            application/java-archive:
+              schema:
+                type: string
+                format: binary
+                x-content-type: application/java-archive
+        "404":
+          description: If the specific build does not exist.
+      x-swagger-router-controller: Builds
 components: {}

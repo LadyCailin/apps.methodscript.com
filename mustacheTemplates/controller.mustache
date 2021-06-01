@@ -6,10 +6,10 @@ const {{classname}} = require('../{{implFolder}}/{{classname}}Service');
 {{#operation}}
 {{#contents}}
 
-module.exports.{{nickname}} = function {{nickname}} (req, res, next{{#parameters}}{{#@first}}, {{/@first}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/parameters}}) {
+module.exports.{{nickname}} = async function {{nickname}} (req, res, next{{#parameters}}{{#@first}}, {{/@first}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/parameters}}) {
 	{{classname}}.{{nickname}}({{#parameters}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/parameters}})
 		.then(function (response) {
-			utils.writeResponse(res, response.response, response.code, response.contentType);
+			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})
 		.catch(function (response) {
 			utils.writeResponse(res, response.response, response.code);

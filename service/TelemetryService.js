@@ -9,20 +9,23 @@ const Telemetry = require('../src/api/Telemetry');
  *
  * returns String
  **/
-exports.telemetryGET = function() {
-	return new Promise(function(resolve, reject) {
+exports.telemetryGET = async function() {
+	return new Promise(async function(resolve, reject) {
 		if(Telemetry.telemetryGET) {
-			const apiResult = Telemetry.telemetryGET();
+			let apiResult = Telemetry.telemetryGET();
 			if(typeof apiResult === "object") {
+				if(apiResult.then) {
+					apiResult = await apiResult;
+				}
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
 				const contentType = apiResult.contentType || (typeof result === "object" ? 'application/json' : 'text/plain');
-				resolve({response: result, code, contentType});
+				resolve({ response: result, code, contentType, headers: apiResult.getHeaders() });
 			} else {
-				resolve({response: apiResult, code: 200});
+				resolve({ response: apiResult, code: 200});
 			}
 		} else {
-			reject({response: "Not Implemented Yet", code: 501 });
+			reject({ response: "Not Implemented Yet", code: 501 });
 		}
 	});
 }
@@ -37,20 +40,23 @@ exports.telemetryGET = function() {
  * key String The previously obtained key
  * no response value expected for this operation
  **/
-exports.telemetryKeyPOST = function(body,key) {
-	return new Promise(function(resolve, reject) {
+exports.telemetryKeyPOST = async function(body,key) {
+	return new Promise(async function(resolve, reject) {
 		if(Telemetry.telemetryKeyPOST) {
-			const apiResult = Telemetry.telemetryKeyPOST(body,key);
+			let apiResult = Telemetry.telemetryKeyPOST(body,key);
 			if(typeof apiResult === "object") {
+				if(apiResult.then) {
+					apiResult = await apiResult;
+				}
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
 				const contentType = apiResult.contentType || (typeof result === "object" ? 'application/json' : 'text/plain');
-				resolve({response: result, code, contentType});
+				resolve({ response: result, code, contentType, headers: apiResult.getHeaders() });
 			} else {
-				resolve({response: apiResult, code: 200});
+				resolve({ response: apiResult, code: 200});
 			}
 		} else {
-			reject({response: "Not Implemented Yet", code: 501 });
+			reject({ response: "Not Implemented Yet", code: 501 });
 		}
 	});
 }

@@ -16,6 +16,7 @@ export class ResponseObject {
 	private payload : any;
 	private code : number;
 	private contentType : string;
+	private headers : any = {};
 
 	public constructor(payload : any, code : number = 200, contentType : string | null = null) {
 		this.payload = payload;
@@ -23,7 +24,6 @@ export class ResponseObject {
 		if(contentType == null) {
 			contentType = typeof payload === "object" ? "application/json" : "text/plain";
 		}
-
 		this.contentType = contentType;
 	}
 
@@ -37,5 +37,13 @@ export class ResponseObject {
 
 	public getContentType() : string {
 		return this.contentType;
+	}
+
+	public addHeader(name : string, value : string) : void {
+		this.headers[name] = value;
+	}
+
+	public getHeaders() : Map<string, string> {
+		return this.headers;
 	}
 }

@@ -25,20 +25,23 @@ const {{classname}} = require('../src/api/{{classname}}');
  * returns {{{returnType}}}
 {{/returnType}}
  **/
-exports.{{{operationId}}} = function({{#parameters}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/parameters}}) {
-	return new Promise(function(resolve, reject) {
+exports.{{{operationId}}} = async function({{#parameters}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/parameters}}) {
+	return new Promise(async function(resolve, reject) {
 		if({{classname}}.{{operationId}}) {
-			const apiResult = {{classname}}.{{operationId}}({{#parameters}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/parameters}});
+			let apiResult = {{classname}}.{{operationId}}({{#parameters}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/parameters}});
 			if(typeof apiResult === "object") {
+				if(apiResult.then) {
+					apiResult = await apiResult;
+				}
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
 				const contentType = apiResult.contentType || (typeof result === "object" ? 'application/json' : 'text/plain');
-				resolve({response: result, code, contentType});
+				resolve({ response: result, code, contentType, headers: apiResult.getHeaders() });
 			} else {
-				resolve({response: apiResult, code: 200});
+				resolve({ response: apiResult, code: 200});
 			}
 		} else {
-			reject({response: "Not Implemented Yet", code: 501 });
+			reject({ response: "Not Implemented Yet", code: 501 });
 		}
 	});
 }

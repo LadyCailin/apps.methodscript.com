@@ -9,20 +9,23 @@ const Meta = require('../src/api/Meta');
  *
  * returns String
  **/
-exports.pingGET = function() {
-	return new Promise(function(resolve, reject) {
+exports.pingGET = async function() {
+	return new Promise(async function(resolve, reject) {
 		if(Meta.pingGET) {
-			const apiResult = Meta.pingGET();
+			let apiResult = Meta.pingGET();
 			if(typeof apiResult === "object") {
+				if(apiResult.then) {
+					apiResult = await apiResult;
+				}
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
 				const contentType = apiResult.contentType || (typeof result === "object" ? 'application/json' : 'text/plain');
-				resolve({response: result, code, contentType});
+				resolve({ response: result, code, contentType, headers: apiResult.getHeaders() });
 			} else {
-				resolve({response: apiResult, code: 200});
+				resolve({ response: apiResult, code: 200});
 			}
 		} else {
-			reject({response: "Not Implemented Yet", code: 501 });
+			reject({ response: "Not Implemented Yet", code: 501 });
 		}
 	});
 }
@@ -35,20 +38,23 @@ exports.pingGET = function() {
  *
  * returns List
  **/
-exports.rootGET = function() {
-	return new Promise(function(resolve, reject) {
+exports.rootGET = async function() {
+	return new Promise(async function(resolve, reject) {
 		if(Meta.rootGET) {
-			const apiResult = Meta.rootGET();
+			let apiResult = Meta.rootGET();
 			if(typeof apiResult === "object") {
+				if(apiResult.then) {
+					apiResult = await apiResult;
+				}
 				const result = apiResult.payload;
 				const code = apiResult.code || 200;
 				const contentType = apiResult.contentType || (typeof result === "object" ? 'application/json' : 'text/plain');
-				resolve({response: result, code, contentType});
+				resolve({ response: result, code, contentType, headers: apiResult.getHeaders() });
 			} else {
-				resolve({response: apiResult, code: 200});
+				resolve({ response: apiResult, code: 200});
 			}
 		} else {
-			reject({response: "Not Implemented Yet", code: 501 });
+			reject({ response: "Not Implemented Yet", code: 501 });
 		}
 	});
 }

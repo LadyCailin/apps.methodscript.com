@@ -1,0 +1,3 @@
+cd "$(dirname "$0")"
+screen -d -m -S app npm start
+

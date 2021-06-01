@@ -1,0 +1,4 @@
+cd "$(dirname "$0")"
+screen -S app -X quit
+git pull
+./start

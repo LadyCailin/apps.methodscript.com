@@ -28,7 +28,8 @@ export async function buildsArtifactGET(artifact: string): Promise<ResponseObjec
 				buildId,
 				name: blob.name,
 				date: blob.properties.createdOn,
-				link: '/builds/' + artifact + "/" + encodeURIComponent(blob.name)
+				link: '/builds/' + artifact + "/" + encodeURIComponent(blob.name),
+				fullLink: 'https://apps.methodscript.com/builds/' + artifact + '/' + encodeURIComponent(blob.name)
 			});
 		}
 		return Promise.resolve(new ResponseObject(blobs));

@@ -1,15 +1,19 @@
 import { ResponseObject } from "../utils/ResponseObject";
 import {ExecException} from "child_process";
 const { BlobServiceClient } = require("@azure/storage-blob");
-const { TableServiceClient } = require("@azure/data-tables");
-const { exec } = require("child_process");
+const { TableClient } = require("@azure/data-tables");
+const util = require('util');
+const exec = util.promisify(require("child_process").exec);
 
 const connStr: string | undefined = process.env.AzureBlobStoreConnectionString;
 let blobServiceClient: any;
-let tableServiceClient: any;
+let tableClient: any;
+
+const buildInfoCache: any = {};
+
 if (typeof (connStr) !== 'undefined') {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-	tableServiceClient = TableServiceClient.fromConnectionString(connStr);
+	tableClient = TableClient.fromConnectionString(connStr, "BuildInfo");
 }
 
 export async function buildsGET(): Promise<ResponseObject> {
@@ -32,15 +36,28 @@ export async function buildsArtifactGET(artifact: string): Promise<ResponseObjec
 			const buildId = blob.name.match("(.*)/.*?")[1];
 			let sha = "";
 			let commitDetails = "";
-			try {
-				sha = (await tableServiceClient.getEntity(artifact, buildId)).sha;
-			} catch(e) {
-				// Not all builds have meta info
-			}
-			if(sha && sha.match(/[a-z0-9]{40}/)) {
-				exec("cd ~/repo; git log -1 " + sha, (error : ExecException|null, stdout : string, stderr : string) => {
-					commitDetails = stdout;
-				});
+			if(artifact == "commandhelperjar") {
+				// Other builds don't currently have this info
+				if(!(buildId in buildInfoCache)) {
+					const buildNumber = buildId.match("build-(.*)")[1];
+					if(buildNumber > 84) {
+						// Builds less than 84 didn't have info yet, just skip these.
+						console.log("Looking up build info for " + buildId);
+						try {
+							sha = (await tableClient.getEntity(artifact, buildId)).SHA;
+						} catch(e) {
+							// Not all builds have meta info
+							console.log(e);
+						}
+						if(sha && sha.match(/[a-z0-9]{40}/)) {
+							const { stdout, stderr } = await exec("cd ~/repo; git log -1 " + sha);
+							commitDetails = stdout;
+						}
+					}
+					buildInfoCache[buildId] = {sha, commitDetails};
+				}
+				sha = buildInfoCache[buildId].sha;
+				commitDetails = buildInfoCache[buildId].commitDetails;
 			}
 			blobs.push({
 				artifact,

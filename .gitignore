@@ -7,3 +7,15 @@ yarn-error.log*
 lib
 lib_test
 last_update.txt
+config/
+jest.config.js
+logs/
+public/
+src/app.hooks.ts
+src/channels.ts
+src/declarations.d.ts
+src/index.ts
+src/logger.ts
+src/middleware/
+src/services/
+test/

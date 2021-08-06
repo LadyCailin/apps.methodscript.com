@@ -1,4 +1,5 @@
 import { ResponseObject } from "../utils/ResponseObject";
+import {ExecException} from "child_process";
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { TableServiceClient } = require("@azure/data-tables");
 const { exec } = require("child_process");
@@ -37,7 +38,7 @@ export async function buildsArtifactGET(artifact: string): Promise<ResponseObjec
 				// Not all builds have meta info
 			}
 			if(sha && sha.match(/[a-z0-9]{40}/)) {
-				exec("cd ~/repo; git log -1 " + sha, (error, stdout, stderr) => {
+				exec("cd ~/repo; git log -1 " + sha, (error : ExecException|null, stdout : string, stderr : string) => {
 					commitDetails = stdout;
 				});
 			}

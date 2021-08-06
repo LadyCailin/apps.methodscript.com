@@ -16,6 +16,7 @@
 	"private": true,
 	"dependencies": {
 		"@azure/storage-blob": "^12.5.0",
+		"@azure/data-tables": "^12.1.0",
 		"@types/node": "^13.13.4",
 		"@types/uuid": "^7.0.3",
 		"connect": "^3.2.0",

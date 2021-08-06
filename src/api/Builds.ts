@@ -1,10 +1,14 @@
 import { ResponseObject } from "../utils/ResponseObject";
 const { BlobServiceClient } = require("@azure/storage-blob");
+const { TableServiceClient } = require("@azure/data-tables");
+const { exec } = require("child_process");
 
 const connStr: string | undefined = process.env.AzureBlobStoreConnectionString;
 let blobServiceClient: any;
+let tableServiceClient: any;
 if (typeof (connStr) !== 'undefined') {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
+	tableServiceClient = TableServiceClient.fromConnectionString(connStr);
 }
 
 export async function buildsGET(): Promise<ResponseObject> {
@@ -18,18 +22,34 @@ export async function buildsGET(): Promise<ResponseObject> {
 
 export async function buildsArtifactGET(artifact: string): Promise<ResponseObject> {
 	try {
+		// Pull the repo
+		exec("cd ~/repo; git pull");
 		const containerClient = blobServiceClient.getContainerClient(artifact);
 		const blobsA = containerClient.listBlobsFlat();
 		const blobs = [];
 		for await (const blob of blobsA) {
 			const buildId = blob.name.match("(.*)/.*?")[1];
+			let sha = "";
+			let commitDetails = "";
+			try {
+				sha = (await tableServiceClient.getEntity(artifact, buildId)).sha;
+			} catch(e) {
+				// Not all builds have meta info
+			}
+			if(sha && sha.match(/[a-z0-9]{40}/)) {
+				exec("cd ~/repo; git log -1 " + sha, (error, stdout, stderr) => {
+					commitDetails = stdout;
+				});
+			}
 			blobs.push({
 				artifact,
 				buildId,
 				name: blob.name,
 				date: blob.properties.createdOn,
 				link: '/builds/' + artifact + "/" + encodeURIComponent(blob.name),
-				fullLink: 'https://apps.methodscript.com/builds/' + artifact + '/' + encodeURIComponent(blob.name)
+				fullLink: 'https://apps.methodscript.com/builds/' + artifact + '/' + encodeURIComponent(blob.name),
+				sha,
+				commitDetails
 			});
 		}
 		return Promise.resolve(new ResponseObject(blobs));

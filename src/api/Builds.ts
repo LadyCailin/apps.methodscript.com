@@ -28,7 +28,7 @@ export async function buildsGET(): Promise<ResponseObject> {
 export async function buildsArtifactGET(artifact: string): Promise<ResponseObject> {
 	try {
 		// Pull the repo
-		exec("cd ~/repo; git pull");
+		exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
 		const containerClient = blobServiceClient.getContainerClient(artifact);
 		const blobsA = containerClient.listBlobsFlat();
 		const blobs = [];

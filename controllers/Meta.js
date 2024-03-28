@@ -3,8 +3,8 @@
 const utils = require('../utils/writer.js');
 const Meta = require('../service/MetaService');
 
-module.exports.pingGET = async function pingGET (req, res, next) {
-	Meta.pingGET()
+module.exports.pingGet = async function pingGet (req, res, next) {
+	Meta.pingGet()
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})
@@ -13,8 +13,8 @@ module.exports.pingGET = async function pingGET (req, res, next) {
 		});
 };
 
-module.exports.rootGET = async function rootGET (req, res, next) {
-	Meta.rootGET()
+module.exports.rootGet = async function rootGet (req, res, next) {
+	Meta.rootGet()
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})

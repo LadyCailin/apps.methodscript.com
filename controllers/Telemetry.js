@@ -3,8 +3,8 @@
 const utils = require('../utils/writer.js');
 const Telemetry = require('../service/TelemetryService');
 
-module.exports.telemetryGET = async function telemetryGET (req, res, next) {
-	Telemetry.telemetryGET()
+module.exports.telemetryGet = async function telemetryGet (req, res, next) {
+	Telemetry.telemetryGet()
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})
@@ -13,8 +13,8 @@ module.exports.telemetryGET = async function telemetryGET (req, res, next) {
 		});
 };
 
-module.exports.telemetryKeyPOST = async function telemetryKeyPOST (req, res, next, body, key) {
-	Telemetry.telemetryKeyPOST(body, key)
+module.exports.telemetryKeyPost = async function telemetryKeyPost (req, res, next, body, key) {
+	Telemetry.telemetryKeyPost(body, key)
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})

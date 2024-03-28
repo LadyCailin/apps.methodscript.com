@@ -5,14 +5,14 @@ const Meta = require('../src/api/Meta');
 
 
 /**
- * Pings the server to check its status
+ * Pings the server to check its status.
  *
  * returns String
  **/
-exports.pingGET = async function() {
+exports.pingGet = async function() {
 	return new Promise(async function(resolve, reject) {
-		if(Meta.pingGET) {
-			let apiResult = Meta.pingGET();
+		if(Meta.pingGet) {
+			let apiResult = Meta.pingGet();
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;
@@ -33,15 +33,15 @@ exports.pingGET = async function() {
 
 
 /**
- * List services on this server
+ * List services on this server.
  * Lists the services that are available on this server. In general, clients must load this page first to determine supported services, and ensure that graceful fallbacks are provided if expected services are missing.
  *
  * returns List
  **/
-exports.rootGET = async function() {
+exports.rootGet = async function() {
 	return new Promise(async function(resolve, reject) {
-		if(Meta.rootGET) {
-			let apiResult = Meta.rootGET();
+		if(Meta.rootGet) {
+			let apiResult = Meta.rootGet();
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;

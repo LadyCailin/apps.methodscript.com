@@ -1,39 +1,37 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
   title: MethodScript Apps
-  description: This is the api for the apps.methodscript.com server. This provides
-    various public functionality for users of the MethodScript programming language.
+  description: |-
+    This is the api for the apps.methodscript.com server. This provides
+    various public functionality for users of the MethodScript programming
+    language.
   termsOfService: apps.methodscript.com/terms
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   version: 1.0.0
-externalDocs:
-  description: Find out more about MethodScript
-  url: https://methodscript.com
 servers:
-- url: http://localhost:8080
-  description: Test localhost server
 - url: https://apps.methodscript.com
-  description: The primary apps.methodscript.com server
+  description: The primary apps.methodscript.com server.
+- url: http://localhost:8080
+  description: Test localhost server.
 tags:
 - name: meta
-  description: Service related calls
-  externalDocs:
-    description: Find out more
-    url: https://methodscript.com
 - name: telemetry
-  description: Telemetry related services
+- name: builds
 paths:
   /:
     get:
       tags:
       - meta
-      summary: List services on this server
-      description: "Lists the services that are available on this server. In general,\
-        \ clients must load this page first to determine supported services, and ensure\
-        \ that graceful fallbacks are provided if expected services are missing."
-      operationId: rootGET
+      summary: List services on this server.
+      description: |-
+        Lists the services that are available on this server. In general,
+        clients must load this page first to determine supported services, and
+        ensure that graceful fallbacks are provided if expected services are
+        missing.
+      operationId: rootGet
+      parameters: []
       responses:
         "200":
           description: This call should always be successful.
@@ -45,13 +43,97 @@ paths:
                   type: string
                 x-content-type: application/json
       x-swagger-router-controller: Meta
+  /builds:
+    get:
+      tags:
+      - builds
+      summary: Provides a list of artifact types available for download.
+      operationId: buildsGet
+      parameters: []
+      responses:
+        "200":
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+      x-swagger-router-controller: Builds
+  /builds/{artifact}:
+    get:
+      tags:
+      - builds
+      summary: Provides a list of builds of the specified artifact available for download.
+      description: |-
+        Provides a list of builds of the specified artifact available for download.
+        Note that the order of the returned artifacts is arbitrary.
+      operationId: buildsArtifactGet
+      parameters:
+      - name: artifact
+        in: path
+        description: The artifact type to list builds for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BuildArtifact'
+                x-content-type: application/json
+        "404":
+          description: If the specified build or artifact cannot be found.
+      x-swagger-router-controller: Builds
+  /builds/{artifact}/{id}:
+    get:
+      tags:
+      - builds
+      summary: Downloads a specific build of the specified artifact type.
+      operationId: buildsArtifactIdGet
+      parameters:
+      - name: artifact
+        in: path
+        description: The artifact type to download
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: The previously obtained id of the build you wish to download.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The request has succeeded.
+          content:
+            application/java-archive:
+              schema:
+                type: string
+                format: binary
+                x-content-type: application/java-archive
+        "404":
+          description: If the specified build or artifact cannot be found.
+      x-swagger-router-controller: Builds
   /ping:
-    description: Pings the server to check its status.
     get:
       tags:
       - meta
-      summary: Pings the server to check its status
-      operationId: pingGET
+      summary: Pings the server to check its status.
+      operationId: pingGet
+      parameters: []
       responses:
         "200":
           description: This call should always be successful.
@@ -62,12 +144,12 @@ paths:
                 x-content-type: text/plain
       x-swagger-router-controller: Meta
   /telemetry:
-    description: "Obtains a telemetry key, which is used for future requests"
     get:
       tags:
       - telemetry
-      summary: "Obtains a telemetry key, which is used for future requests"
-      operationId: telemetryGET
+      summary: "Obtains a telemetry key, which is used for future requests."
+      operationId: telemetryGet
+      parameters: []
       responses:
         "200":
           description: "Unless the client has been blocked, this call will always\
@@ -81,27 +163,28 @@ paths:
           description: "If this client has been blocked, this will not return a key."
       x-swagger-router-controller: Telemetry
   /telemetry/{key}:
-    description: Submits a telemetry event
     post:
       tags:
       - telemetry
       summary: Submits a telemetry event.
-      description: "Submits a telemetry event, which is forwarded to the Application\
-        \ Insights application."
-      operationId: telemetryKeyPOST
+      description: |-
+        Submits a telemetry event, which is forwarded to the Application
+        Insights application.
+      operationId: telemetryKeyPost
       parameters:
       - name: key
         in: path
-        description: The previously obtained key
+        description: The previously obtained key.
         required: true
         style: simple
         explode: false
         schema:
           type: string
       requestBody:
-        description: "The telemetry event. The content should be text/plain, even\
-          \ though it will actually be json, as server merely forwards the content\
-          \ on to ApplicationInsights."
+        description: |-
+          The telemetry event. The content should be text/plain, even though
+          it will actually be json, as server merely forwards the content on to
+          ApplicationInsights.
         content:
           text/plain:
             schema:
@@ -113,90 +196,60 @@ paths:
         "400":
           description: If the payload is malformed.
         "403":
-          description: "If the key was rejected. This can happen for a number of reasons,\
-            \ including things like server restart or key expiry. In any case, simply\
-            \ re-request a new key and try again. It can also happen if the server\
-            \ detects you're trying to do bad things."
+          description: |-
+            If the key was rejected. This can happen for a number of reasons,
+            including things like server restart or key expiry. In any case,
+            simply re-request a new key and try again. It can also happen if the
+            server detects you're trying to do bad things.
         "502":
-          description: "If the submission was successful, but Application Insights\
-            \ rejected or otherwise unsuccessfully processed the request."
+          description: |-
+            If the submission was successful, but Application Insights rejected
+            or otherwise unsuccessfully processed the request.
       x-swagger-router-controller: Telemetry
-  /builds:
-    description: Provides a list of artifact types available for download
-    get:
-      tags:
-      - builds
-      summary: Provides a list of artifact types available for download
-      operationId: buildsGET
-      responses:
-        "200":
-          description: Returns a list of builds available.
-          content:
-            application/json:
-              schema:
-                type: string
-                x-content-type: application/json
-      x-swagger-router-controller: Builds
-  /builds/{artifact}:
-    description: Provides a list of builds of the specified artifact available for
-      download
-    get:
-      tags:
-      - builds
-      summary: Provides a list of builds of the specified artifact available for download
-      operationId: buildsArtifactGET
-      parameters:
-      - name: artifact
-        in: path
-        description: The artifact type to list builds for
-        required: true
-        style: simple
-        explode: false
-        schema:
+components:
+  schemas:
+    BuildArtifact:
+      required:
+      - artifact
+      - buildId
+      - commitDetails
+      - date
+      - fullLink
+      - link
+      - name
+      - sha
+      type: object
+      properties:
+        artifact:
           type: string
-      responses:
-        "200":
-          description: Returns a list of builds available.
-          content:
-            application/json:
-              schema:
-                type: string
-                x-content-type: application/json
-      x-swagger-router-controller: Builds
-  /builds/{artifact}/{id}:
-    description: Downloads a specific build of the specified artifact type
-    get:
-      tags:
-      - builds
-      summary: Downloads a specific build
-      operationId: buildsArtifactIdGET
-      parameters:
-      - name: artifact
-        in: path
-        description: The artifact type to download
-        required: true
-        style: simple
-        explode: false
-        schema:
+          description: The artifact name.
+        buildId:
           type: string
-      - name: id
-        in: path
-        description: The previously obtained id of the build you wish to download
-        required: true
-        style: simple
-        explode: false
-        schema:
+          description: "The build id, i.e. \"build-123\"."
+        name:
           type: string
-      responses:
-        "200":
-          description: If the specific build exists.
-          content:
-            application/java-archive:
-              schema:
-                type: string
-                format: binary
-                x-content-type: application/java-archive
-        "404":
-          description: If the specific build does not exist.
-      x-swagger-router-controller: Builds
-components: {}
+          description: |-
+            The full artifact name, i.e. "build-123/artifact.jar".
+            This is what is used in the url to request the artifact.
+        date:
+          type: string
+          description: The datetime when the artifact was built. yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        link:
+          type: string
+          description: "The path for the url, i.e. \"/builds/artifact/build-123%2Fartifact.jar\"\
+            ."
+        fullLink:
+          type: string
+          description: "The full link to the artifact, including the host."
+          format: uri
+        sha:
+          type: string
+          description: |-
+            The git sha hash of the commit that was used to make this build.
+            May be an empty string, if the commit isn't known, never null.
+        commitDetails:
+          type: string
+          description: |-
+            The git commit message of the commit used to make this build.
+            May be an empty string, if the commit isn't known, never null.
+      description: Metadata about an artifact.

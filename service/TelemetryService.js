@@ -5,14 +5,14 @@ const Telemetry = require('../src/api/Telemetry');
 
 
 /**
- * Obtains a telemetry key, which is used for future requests
+ * Obtains a telemetry key, which is used for future requests.
  *
  * returns String
  **/
-exports.telemetryGET = async function() {
+exports.telemetryGet = async function() {
 	return new Promise(async function(resolve, reject) {
-		if(Telemetry.telemetryGET) {
-			let apiResult = Telemetry.telemetryGET();
+		if(Telemetry.telemetryGet) {
+			let apiResult = Telemetry.telemetryGet();
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;
@@ -36,14 +36,16 @@ exports.telemetryGET = async function() {
  * Submits a telemetry event.
  * Submits a telemetry event, which is forwarded to the Application Insights application.
  *
- * body String The telemetry event. The content should be text/plain, even though it will actually be json, as server merely forwards the content on to ApplicationInsights.
- * key String The previously obtained key
+ * body String The telemetry event. The content should be text/plain, even though
+it will actually be json, as server merely forwards the content on to
+ApplicationInsights.
+ * key String The previously obtained key.
  * no response value expected for this operation
  **/
-exports.telemetryKeyPOST = async function(body,key) {
+exports.telemetryKeyPost = async function(body,key) {
 	return new Promise(async function(resolve, reject) {
-		if(Telemetry.telemetryKeyPOST) {
-			let apiResult = Telemetry.telemetryKeyPOST(body,key);
+		if(Telemetry.telemetryKeyPost) {
+			let apiResult = Telemetry.telemetryKeyPost(body,key);
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;

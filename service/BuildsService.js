@@ -5,15 +5,16 @@ const Builds = require('../src/api/Builds');
 
 
 /**
- * Provides a list of builds of the specified artifact available for download
+ * Provides a list of builds of the specified artifact available for download.
+ * Provides a list of builds of the specified artifact available for download. Note that the order of the returned artifacts is arbitrary.
  *
- * artifact String The artifact type to list builds for
- * returns String
+ * artifact String The artifact type to list builds for.
+ * returns List
  **/
-exports.buildsArtifactGET = async function(artifact) {
+exports.buildsArtifactGet = async function(artifact) {
 	return new Promise(async function(resolve, reject) {
-		if(Builds.buildsArtifactGET) {
-			let apiResult = Builds.buildsArtifactGET(artifact);
+		if(Builds.buildsArtifactGet) {
+			let apiResult = Builds.buildsArtifactGet(artifact);
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;
@@ -34,16 +35,16 @@ exports.buildsArtifactGET = async function(artifact) {
 
 
 /**
- * Downloads a specific build
+ * Downloads a specific build of the specified artifact type.
  *
  * artifact String The artifact type to download
- * id String The previously obtained id of the build you wish to download
+ * id String The previously obtained id of the build you wish to download.
  * returns byte[]
  **/
-exports.buildsArtifactIdGET = async function(artifact,id) {
+exports.buildsArtifactIdGet = async function(artifact,id) {
 	return new Promise(async function(resolve, reject) {
-		if(Builds.buildsArtifactIdGET) {
-			let apiResult = Builds.buildsArtifactIdGET(artifact,id);
+		if(Builds.buildsArtifactIdGet) {
+			let apiResult = Builds.buildsArtifactIdGet(artifact,id);
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;
@@ -64,14 +65,14 @@ exports.buildsArtifactIdGET = async function(artifact,id) {
 
 
 /**
- * Provides a list of artifact types available for download
+ * Provides a list of artifact types available for download.
  *
- * returns String
+ * returns List
  **/
-exports.buildsGET = async function() {
+exports.buildsGet = async function() {
 	return new Promise(async function(resolve, reject) {
-		if(Builds.buildsGET) {
-			let apiResult = Builds.buildsGET();
+		if(Builds.buildsGet) {
+			let apiResult = Builds.buildsGet();
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;

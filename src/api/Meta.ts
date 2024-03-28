@@ -1,7 +1,7 @@
 
 import { ResponseObject } from '../utils/ResponseObject';
 
-export function pingGET() : ResponseObject {
+export function pingGet() : ResponseObject {
 	const array = [
 		"Pong!",
 		"Pang!",
@@ -16,7 +16,7 @@ export function pingGET() : ResponseObject {
 	return new ResponseObject(array[Math.floor(Math.random() * array.length)]);
 }
 
-export function rootGET() : ResponseObject {
+export function rootGet() : ResponseObject {
 	const array = [
 		"/ping"
 	];

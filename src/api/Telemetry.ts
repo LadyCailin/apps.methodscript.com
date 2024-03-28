@@ -24,13 +24,13 @@ function validateMetric(metric : string) : boolean {
 	return supportedMetrics.indexOf(metric) >= 0;
 }
 
-export function telemetryGET() : ResponseObject {
+export function telemetryGet() : ResponseObject {
 	const key : Key = keyManager.generateKey();
 	const response : ResponseObject = new ResponseObject(key.getKey(), 200, "text/plain");
 	return response;
 }
 
-export function telemetryKeyPOST(body : string, key : string) : ResponseObject {
+export function telemetryKeyPost(body : string, key : string) : ResponseObject {
 	if(!keyManager.validKey(key)) {
 		return ResponseObject.FORBIDDEN;
 	}

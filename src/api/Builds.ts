@@ -1,7 +1,7 @@
 import { ResponseObject } from "../utils/ResponseObject";
 import {ExecException} from "child_process";
 const { BlobServiceClient } = require("@azure/storage-blob");
-const { TableServiceClient } = require("@azure/data-tables");
+const { TableClient } = require("@azure/data-tables");
 const { exec } = require("child_process");
 
 const connStr: string | undefined = process.env.AzureBlobStoreConnectionString;
@@ -9,10 +9,10 @@ let blobServiceClient: any;
 let tableServiceClient: any;
 if (typeof (connStr) !== 'undefined') {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-	tableServiceClient = TableServiceClient.fromConnectionString(connStr);
+	tableServiceClient = TableClient.fromConnectionString(connStr);
 }
 
-export async function buildsGET(): Promise<ResponseObject> {
+export async function buildsGet(): Promise<ResponseObject> {
 	const containersA = blobServiceClient.listContainers();
 	const containers = [];
 	for await (const container of containersA) {
@@ -21,7 +21,7 @@ export async function buildsGET(): Promise<ResponseObject> {
 	return Promise.resolve(new ResponseObject(containers));
 }
 
-export async function buildsArtifactGET(artifact: string): Promise<ResponseObject> {
+export async function buildsArtifactGet(artifact: string): Promise<ResponseObject> {
 	try {
 		// Pull the repo
 		exec("cd ~/repo; git pull");
@@ -36,6 +36,7 @@ export async function buildsArtifactGET(artifact: string): Promise<ResponseObjec
 				sha = (await tableServiceClient.getEntity(artifact, buildId)).sha;
 			} catch(e) {
 				// Not all builds have meta info
+				console.log(e);
 			}
 			if(sha && sha.match(/[a-z0-9]{40}/)) {
 				exec("cd ~/repo; git log -1 " + sha, (error : ExecException|null, stdout : string, stderr : string) => {
@@ -54,7 +55,7 @@ export async function buildsArtifactGET(artifact: string): Promise<ResponseObjec
 			});
 		}
 		return Promise.resolve(new ResponseObject(blobs));
-	} catch (ex) {
+	} catch (ex: any) {
 		return Promise.resolve(new ResponseObject(ex.message, 400));
 	}
 }
@@ -72,7 +73,7 @@ async function streamToBuffer(readableStream : any) {
 	});
 }
 
-export async function buildsArtifactIdGET(artifact: string, id: string): Promise<ResponseObject> {
+export async function buildsArtifactIdGet(artifact: string, id: string): Promise<ResponseObject> {
 	if (id === null) {
 		return Promise.resolve(new ResponseObject("Invalid id", 400));
 	}
@@ -89,7 +90,7 @@ export async function buildsArtifactIdGET(artifact: string, id: string): Promise
 		const ro = new ResponseObject(buffer, 200, "application/java-archive");
 		ro.addHeader("Content-Disposition", "attachment; filename=" + filename);
 		return Promise.resolve(ro);
-	} catch (ex) {
+	} catch (ex: any) {
 		return Promise.resolve(new ResponseObject(ex.message, 400));
 	}
 }

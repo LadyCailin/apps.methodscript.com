@@ -79,6 +79,13 @@ paths:
         explode: false
         schema:
           type: string
+      - name: latest
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
       responses:
         "200":
           description: The request has succeeded.

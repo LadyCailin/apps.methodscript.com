@@ -3,8 +3,8 @@
 const utils = require('../utils/writer.js');
 const Builds = require('../service/BuildsService');
 
-module.exports.buildsArtifactGet = async function buildsArtifactGet (req, res, next, artifact) {
-	Builds.buildsArtifactGet(artifact)
+module.exports.buildsArtifactGet = async function buildsArtifactGet (req, res, next, artifact, latest) {
+	Builds.buildsArtifactGet(artifact, latest)
 		.then(function (response) {
 			utils.writeResponse(res, response.response, response.code, response.contentType, response.headers);
 		})

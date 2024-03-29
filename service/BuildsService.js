@@ -9,12 +9,13 @@ const Builds = require('../src/api/Builds');
  * Provides a list of builds of the specified artifact available for download. Note that the order of the returned artifacts is arbitrary.
  *
  * artifact String The artifact type to list builds for.
+ * latest Boolean  (optional)
  * returns List
  **/
-exports.buildsArtifactGet = async function(artifact) {
+exports.buildsArtifactGet = async function(artifact,latest) {
 	return new Promise(async function(resolve, reject) {
 		if(Builds.buildsArtifactGet) {
-			let apiResult = Builds.buildsArtifactGet(artifact);
+			let apiResult = Builds.buildsArtifactGet(artifact,latest);
 			if(typeof apiResult === "object") {
 				if(apiResult.then) {
 					apiResult = await apiResult;

@@ -1,5 +1,5 @@
 import { ResponseObject } from "../utils/ResponseObject";
-import {ExecException} from "child_process";
+import * as Models from "../../models/Api";
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { TableClient } = require("@azure/data-tables");
 const util = require('util');
@@ -25,13 +25,14 @@ export async function buildsGet(): Promise<ResponseObject> {
 	return Promise.resolve(new ResponseObject(containers));
 }
 
-export async function buildsArtifactGet(artifact: string): Promise<ResponseObject> {
+export async function buildsArtifactGet(artifact: string, latest?: boolean): Promise<ResponseObject> {
 	try {
 		// Pull the repo
 		exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
 		const containerClient = blobServiceClient.getContainerClient(artifact);
 		const blobsA = containerClient.listBlobsFlat();
-		const blobs = [];
+		const blobs : Array<Models.BuildArtifact> = [];
+		let latestArtifact : Models.BuildArtifact | null = null;
 		for await (const blob of blobsA) {
 			const buildId = blob.name.match("(.*)/.*?")[1];
 			let sha = "";
@@ -59,7 +60,7 @@ export async function buildsArtifactGet(artifact: string): Promise<ResponseObjec
 				sha = buildInfoCache[buildId].sha;
 				commitDetails = buildInfoCache[buildId].commitDetails;
 			}
-			blobs.push({
+			const buildArtifact : Models.BuildArtifact = {
 				artifact,
 				buildId,
 				name: blob.name,
@@ -68,7 +69,23 @@ export async function buildsArtifactGet(artifact: string): Promise<ResponseObjec
 				fullLink: 'https://apps.methodscript.com/builds/' + artifact + '/' + encodeURIComponent(blob.name),
 				sha,
 				commitDetails
-			});
+			};
+			if(latest) {
+				if(latestArtifact == null) {
+					latestArtifact = buildArtifact;
+				} else {
+					const currentDate : Date = new Date(buildArtifact.date);
+					const latestDate : Date = new Date(latestArtifact.date);
+					if(currentDate > latestDate) {
+						latestArtifact = buildArtifact;
+					}
+				}
+			} else {
+				blobs.push(buildArtifact);
+			}
+		}
+		if(latest && latestArtifact != null) {
+			blobs.push(latestArtifact);
 		}
 		return Promise.resolve(new ResponseObject(blobs));
 	} catch (ex: any) {

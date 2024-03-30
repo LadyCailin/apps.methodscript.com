@@ -12,7 +12,7 @@ let tableClient: any;
 
 const buildInfoCache: any = {};
 
-if (typeof (connStr) !== 'undefined') {
+if (typeof (connStr) !== 'undefined' && connStr !== null && connStr !== "") {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
 	tableClient = TableClient.fromConnectionString(connStr, "BuildInfo");
 }
@@ -32,6 +32,8 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 		// Pull the repo
 		if(!runningLocal) {
 			exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
+		} else if(typeof(blobServiceClient) === "undefined") {
+			return Promise.resolve(new ResponseObject("AzureBlobStoreConnectionString must be set to run this command.", 400));
 		}
 		const containerClient = blobServiceClient.getContainerClient(artifact);
 		const blobsA = containerClient.listBlobsFlat();

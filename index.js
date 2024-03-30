@@ -2,8 +2,9 @@
 
 var path = require('path');
 var http = require('http');
-
 var oas3Tools = require('oas3-tools');
+var cors = require('cors')
+
 var serverPort = 8080;
 
 // swaggerRouter configuration
@@ -28,12 +29,21 @@ if(process.argv && process.argv[2] === "local-start") {
 	CORS.push('http://127.0.0.1:3001');
 }
 
-app.use(function (req, res, next) {
+app.options('*', cors(function (req, callback) {
+	var corsOptions = { origin: false };
 	if(CORS.indexOf(req.header('Origin')) !== -1) {
-		res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
+		// res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
+		corsOptions = { origin: true };
 	}
-	next();
-});
+	callback(null, corsOptions);
+}));
+
+// app.use(function (req, res, next) {
+// 	if(CORS.indexOf(req.header('Origin')) !== -1) {
+// 		res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
+// 	}
+// 	next();
+// });
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, function () {

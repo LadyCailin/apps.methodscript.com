@@ -29,23 +29,17 @@ if(process.argv && process.argv[2] === "local-start") {
 	CORS.push('http://127.0.0.1:3001');
 }
 
-app.options('*', cors(function (req, callback) {
-	var corsOptions = { origin: false };
-	if(CORS.indexOf(req.header('Origin')) !== -1) {
-		// res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
-		corsOptions = { origin: true };
-	}
-	callback(null, corsOptions);
-}));
+app.use(cors({ origin: CORS }));
 
-// app.use(function (req, res, next) {
-// 	if(CORS.indexOf(req.header('Origin')) !== -1) {
-// 		res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
-// 	}
-// 	next();
-// });
+// This is a hack to work around https://github.com/bug-hunters/oas3-tools/issues/41
+// The project appears abandoned though, and may require migration away from.
+// https://www.npmjs.com/package/express-openapi is potentially an option.
+const numberOfCustomMiddlewares = 1;
+const stack = app._router.stack;
+const lastEntries = stack.splice(app._router.stack.length - numberOfCustomMiddlewares);
+const firstEntries = stack.splice(0, 5);
+app._router.stack = [...firstEntries, ...lastEntries, ...stack];
 
-// Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, function () {
 	console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
 	console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);

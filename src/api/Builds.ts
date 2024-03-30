@@ -16,6 +16,16 @@ if (typeof (connStr) !== 'undefined' && connStr !== null && connStr !== "") {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
 	tableClient = TableClient.fromConnectionString(connStr, "BuildInfo");
 }
+setInterval(function() {
+	// Pull the repo
+	if(!runningLocal) {
+		console.log("Updating repo.");
+		exec("cd ~/repo; git fetch origin;");
+		setTimeout(function() {
+			exec("git reset --hard origin/master");
+		}, 1000);
+	}
+}, 60000);
 
 export async function buildsGet(): Promise<ResponseObject> {
 	const containersA = blobServiceClient.listContainers();
@@ -29,10 +39,7 @@ export async function buildsGet(): Promise<ResponseObject> {
 export async function buildsArtifactGet(latest: boolean, artifact: string): Promise<ResponseObject> {
 	// TODO: Figure out why the framework reverses these parameters.
 	try {
-		// Pull the repo
-		if(!runningLocal) {
-			exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
-		} else if(typeof(blobServiceClient) === "undefined") {
+		if(typeof(blobServiceClient) === "undefined") {
 			return Promise.resolve(new ResponseObject("AzureBlobStoreConnectionString must be set to run this command.", 400));
 		}
 		const containerClient = blobServiceClient.getContainerClient(artifact);

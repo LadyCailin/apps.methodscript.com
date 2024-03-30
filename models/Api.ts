@@ -39,4 +39,9 @@ export interface BuildArtifact {
    * May be an empty string, if the commit isn't known, never null.
    */
   commitDetails: string;
+  /**
+   * A poisoned build shouldn't be recommended. This is a build that is known to have had problems, but
+   * was already published, and will not be taken down.
+   */
+  poisoned: boolean;
 }

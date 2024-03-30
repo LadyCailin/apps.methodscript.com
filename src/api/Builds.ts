@@ -54,8 +54,11 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 		let latestArtifact : Models.BuildArtifact | null = null;
 		for await (const blob of blobsA) {
 			const buildId = blob.name.match("(.*)/.*?")[1];
+			const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
+			const meta = (await blockBlobClient.getProperties()).metadata;
 			let sha = "";
 			let commitDetails = "";
+			let poisoned: boolean = false;
 			if(artifact === "commandhelperjar" && !runningLocal) {
 				// Other builds don't currently have this info
 				if(!(buildId in buildInfoCache)) {
@@ -79,6 +82,10 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 				sha = buildInfoCache[buildId].sha;
 				commitDetails = buildInfoCache[buildId].commitDetails;
 			}
+			// To set a build as poisoned, set the file itself to have the metadata "poisoned"->"true"
+			if(typeof(meta.poisoned) !== "undefined") {
+				poisoned = meta.poisoned === "true";
+			}
 			const buildArtifact : Models.BuildArtifact = {
 				artifact,
 				buildId,
@@ -87,7 +94,8 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 				link: '/builds/' + artifact + "/" + encodeURIComponent(blob.name),
 				fullLink: 'https://apps.methodscript.com/builds/' + artifact + '/' + encodeURIComponent(blob.name),
 				sha,
-				commitDetails
+				commitDetails,
+				poisoned
 			};
 			if(latest) {
 				if(latestArtifact == null) {

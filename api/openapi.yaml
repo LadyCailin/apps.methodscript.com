@@ -224,6 +224,7 @@ components:
       - fullLink
       - link
       - name
+      - poisoned
       - sha
       type: object
       properties:
@@ -259,4 +260,9 @@ components:
           description: |-
             The git commit message of the commit used to make this build.
             May be an empty string, if the commit isn't known, never null.
+        poisoned:
+          type: boolean
+          description: |-
+            A poisoned build shouldn't be recommended. This is a build that is known to have had problems, but
+            was already published, and will not be taken down.
       description: Metadata about an artifact.

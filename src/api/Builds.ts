@@ -20,9 +20,15 @@ setInterval(function() {
 	// Pull the repo
 	if(!runningLocal) {
 		console.log("Updating repo.");
-		exec("cd ~/repo; git fetch origin;");
+		var errorHandler = (error: Error, stdout: string, stderr: string) => {
+			if(error) {
+				console.log(stderr);
+			}
+		};
+		exec("cd ~/repo; git fetch origin;", errorHandler);
 		setTimeout(function() {
-			exec("git reset --hard origin/master");
+			exec("git reset --hard origin/master", errorHandler);
+			console.log("Repo update complete.");
 		}, 1000);
 	}
 }, 60000);

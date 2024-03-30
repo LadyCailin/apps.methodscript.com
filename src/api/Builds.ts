@@ -111,7 +111,7 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 			if(latest) {
 				if(latestArtifact == null) {
 					latestArtifact = buildArtifact;
-				} else {
+				} else if(!poisoned) {
 					const currentDate : Date = new Date(buildArtifact.date);
 					const latestDate : Date = new Date(latestArtifact.date);
 					if(currentDate > latestDate) {

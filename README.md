@@ -16,23 +16,17 @@ To view the Swagger UI interface:
 open http://url:8080/docs
 ```
 
-On your local machine, to run the server, you probably want to instead start the server with
+### Debugging/Running Locally
 
-```
-npm run-script local-start
-```
+To debug the server, you can run as usual (F5 or Ctrl+F5) from Visual Studio Code, setting breakpoints and such.
 
-Which configures a few settings, such as a more open CORS policy, as well as starts the server up listening for debug connections.
+Some features are hard to replicate locally, you can set the environmental variable RunningLocal="true" to disable some of these
+features. For full funtionality, you also need to set:
 
-### Debugging
+AzureBlobStoreConnectionString="DefaultEndpointsProtocol=https;AccountName=<???>;AccountKey=<???>;EndpointSuffix=core.windows.net"
+ApplicationInsightsInstrumentationKey="<???>"
 
-To debug the server, start the server using `npm run-script local-start` as above. Then, in your browser, open `chrome://inspect` for Chrome,
-and `edge://inspect` for Edge. Click on the `Open dedicated DevTools for Node` link. In the connection tab, ensure that it is configured to
-connect to `localhost:9229`. If so, it should automatically connect.
-
-Once connected, in the Sources tab, you should then see the files for the server, and can set breakpoints as usual.
-
-If you want the server to hit a breakpoint at the start, so you can observe startup, you can instead use `npm run-script local-start-break`.
+as environmental variables, which contains the credentials for the Azure Blob Store, and Applications Insight key.
 
 ## Development
 

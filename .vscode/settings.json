@@ -1,0 +1,4 @@
+{
+	"debug.javascript.unmapMissingSources": true,
+	"typescript.tsdk": "node_modules/typescript/lib"
+}

@@ -1,5 +1,6 @@
 
 module.exports = {
+    "target": "es2020",
     "env": {
         "browser": false,
         "es2020": true,

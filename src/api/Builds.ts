@@ -6,6 +6,7 @@ const util = require('util');
 const exec = util.promisify(require("child_process").exec);
 
 const connStr: string | undefined = process.env.AzureBlobStoreConnectionString;
+const runningLocal: boolean = ("true" === process.env.RunningLocal) || false;
 let blobServiceClient: any;
 let tableClient: any;
 
@@ -25,10 +26,13 @@ export async function buildsGet(): Promise<ResponseObject> {
 	return Promise.resolve(new ResponseObject(containers));
 }
 
-export async function buildsArtifactGet(artifact: string, latest?: boolean): Promise<ResponseObject> {
+export async function buildsArtifactGet(latest: boolean, artifact: string): Promise<ResponseObject> {
+	// TODO: Figure out why the framework reverses these parameters.
 	try {
 		// Pull the repo
-		exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
+		if(!runningLocal) {
+			exec("cd ~/repo; git fetch origin; git reset --hard origin/master");
+		}
 		const containerClient = blobServiceClient.getContainerClient(artifact);
 		const blobsA = containerClient.listBlobsFlat();
 		const blobs : Array<Models.BuildArtifact> = [];
@@ -37,7 +41,7 @@ export async function buildsArtifactGet(artifact: string, latest?: boolean): Pro
 			const buildId = blob.name.match("(.*)/.*?")[1];
 			let sha = "";
 			let commitDetails = "";
-			if(artifact === "commandhelperjar") {
+			if(artifact === "commandhelperjar" && !runningLocal) {
 				// Other builds don't currently have this info
 				if(!(buildId in buildInfoCache)) {
 					const buildNumber = buildId.match("build-(.*)")[1];
@@ -88,8 +92,12 @@ export async function buildsArtifactGet(artifact: string, latest?: boolean): Pro
 			blobs.push(latestArtifact);
 		}
 		return Promise.resolve(new ResponseObject(blobs));
-	} catch (ex: any) {
-		return Promise.resolve(new ResponseObject(ex.message, 400));
+	} catch (ex: unknown) {
+		if(ex instanceof Error) {
+			return Promise.resolve(new ResponseObject(ex.message, 400));
+		}  else {
+			return Promise.resolve(new ResponseObject(ex, 400));
+		}
 	}
 }
 
@@ -123,7 +131,11 @@ export async function buildsArtifactIdGet(artifact: string, id: string): Promise
 		const ro = new ResponseObject(buffer, 200, "application/java-archive");
 		ro.addHeader("Content-Disposition", "attachment; filename=" + filename);
 		return Promise.resolve(ro);
-	} catch (ex: any) {
-		return Promise.resolve(new ResponseObject(ex.message, 400));
+	} catch (ex: unknown) {
+		if(ex instanceof Error) {
+			return Promise.resolve(new ResponseObject(ex.message, 400));
+		} else {
+			return Promise.resolve(new ResponseObject(ex, 400));
+		}
 	}
 }

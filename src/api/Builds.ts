@@ -11,6 +11,7 @@ let blobServiceClient: any;
 let tableClient: any;
 
 const buildInfoCache: any = {};
+const buildMetaCache: any = {};
 
 if (typeof (connStr) !== 'undefined' && connStr !== null && connStr !== "") {
 	blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
@@ -52,10 +53,20 @@ export async function buildsArtifactGet(latest: boolean, artifact: string): Prom
 		const blobsA = containerClient.listBlobsFlat();
 		const blobs : Array<Models.BuildArtifact> = [];
 		let latestArtifact : Models.BuildArtifact | null = null;
+		const oneWeekAgo = new Date();
+		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 		for await (const blob of blobsA) {
 			const buildId = blob.name.match("(.*)/.*?")[1];
-			const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
-			const meta = (await blockBlobClient.getProperties()).metadata;
+			let meta;
+			if(buildId in buildMetaCache
+					// Always grab more recent builds, in case it's been changed just now.
+					&& new Date(blob.properties.createdOn) < oneWeekAgo) {
+				meta = buildMetaCache[buildId];
+			} else {
+				const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
+				meta = (await blockBlobClient.getProperties()).metadata;
+				buildMetaCache[buildId] = meta;
+			}
 			let sha = "";
 			let commitDetails = "";
 			let poisoned: boolean = false;

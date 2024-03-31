@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-screen -d -m -S app npm start
+screen -d -m -S app -L -Logfile /var/log/app npm start
 

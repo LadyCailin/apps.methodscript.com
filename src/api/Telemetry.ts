@@ -13,7 +13,8 @@ const azureAppInsightsPath : string = "/v2/track";
 let nag : boolean = true;
 
 const supportedMetrics : Array<string> = [
-	"metrics.methodscript.startup",
+	"metrics.methodscript.startup", // Deprecated. Remove once old clients have updated.
+	"logs.methodscript.startup",
 	"logs.methodscript.startupMode",
 	"metrics.methodscript.saOn",
 ];

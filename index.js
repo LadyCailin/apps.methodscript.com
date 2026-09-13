@@ -6,6 +6,7 @@ var oas3Tools = require('oas3-tools');
 var cors = require('cors')
 
 var serverPort = 8080;
+var serverHost = '127.0.0.1';
 
 // swaggerRouter configuration
 var options = {
@@ -40,9 +41,9 @@ const lastEntries = stack.splice(app._router.stack.length - numberOfCustomMiddle
 const firstEntries = stack.splice(0, 5);
 app._router.stack = [...firstEntries, ...lastEntries, ...stack];
 
-http.createServer(app).listen(serverPort, function () {
-	console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-	console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
+http.createServer(app).listen(serverPort, serverHost, function () {
+	console.log('Your server is listening on %s:%d (http://%s:%d)', serverHost, serverPort, serverHost, serverPort);
+	console.log('Swagger-ui is available on http://%s:%d/docs', serverHost, serverPort);
 });
 
 
